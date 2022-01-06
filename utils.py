@@ -424,7 +424,10 @@ def generate_ngram_hits(word_list,gram_size,hits_list,skills) :
     for gram in generator : 
         value_text = ' '.join(value for value in gram).lower()
         for item in skills : 
-            if value_text in item : 
+            # !THIS WONT WORK,THERE WILL BE LOT OF SKILLS EXTRACTED
+            # !TO IMPLEMENT THIS PROPERLY, WILL NEED TO SPLIT SKILLS INTO 1_GRAM, 2_GRAM, 3_GRAM AND ONLY 
+            # !CHECK FOR THE CORRESPONDING ONES
+            if item in value_text : 
                 hits_list.append(value_text)
     return hits_list
 
