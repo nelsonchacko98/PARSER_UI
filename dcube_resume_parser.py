@@ -47,10 +47,8 @@ class ResumeParser(object):
         name , otherHits = utils.extract_name_regex(self.__lines)
         email = utils.extract_email(self.__text)
         mobile = utils.extract_mobile_number(self.__text, self.__custom_regex)
-        skills = utils.extract_skills(
-                    self.__nlp,
-                    self.__noun_chunks,
-                    self.__skills_file
+        skills = utils.extract_skills_new(
+                    self.__text_raw
                 )
         # edu = utils.extract_education(
         #               [sent.string.strip() for sent in self.__nlp.sents]
@@ -86,10 +84,10 @@ def parser() :
         print(f"Reading File {f}")
         obj = ResumeParser(f)
         details = obj.get_extracted_data()
-        fileName = f.split('\\')[-1]
         
-        fileName,ext = os.path.splitext(fileName)
-        
+        # fileName = f.split('\\')[-1]
+        fileName = os.path.split(f)[1].split('.')[0]
+                
         fOut = open(f'json_out/{fileName}.json','w') 
         fOut.write(json.dumps(details,indent=4))
         fOut.close()

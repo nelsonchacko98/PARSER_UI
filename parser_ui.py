@@ -235,7 +235,7 @@ with open('job_description.pkl','rb') as fopen :
 
 
 skills = []
-f = open('skills.csv','r')
+f = open('skills_new.csv','r')
 reader = csv.reader(f)
 
 for row in reader : 

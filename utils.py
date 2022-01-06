@@ -1,25 +1,25 @@
 # Author: Omkar Pathak
 
+import csv
 import io
 import os
 import re
-import nltk
-from nltk import text
-import pandas as pd
-import docx2txt
 from datetime import datetime
+from io import StringIO
+from string import punctuation
+import nltk
+import pandas as pd
 from dateutil import relativedelta
-import constants as cs
+from nltk import text
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 from pdfminer.converter import TextConverter
-from pdfminer.pdfinterp import PDFPageInterpreter
-from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.layout import LAParams
+from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
 from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFSyntaxError
-from nltk.stem import WordNetLemmatizer
-from nltk.corpus import stopwords
-from io import StringIO
 
+import constants as cs
 
 
 def convertPDFToText(path):
@@ -418,6 +418,46 @@ def extract_skills(nlp_text, noun_chunks, skills_file=None):
     return [i.capitalize() for i in set([i.lower() for i in skillset])]
 
 
+""" n_gram generator """
+def generate_ngram_hits(word_list,gram_size,hits_list,skills) : 
+    generator = nltk.ngrams(word_list,gram_size)
+    for gram in generator : 
+        value_text = ' '.join(value for value in gram).lower()
+        for item in skills : 
+            if value_text in item : 
+                hits_list.append(value_text)
+    return hits_list
+
+""" Extract skills by matching it with a saved dataset
+    bi_gram, tri_gram matching is also done to account for skills like
+    machine learning, natural language processing """
+def extract_skills_new(text_raw, skills_file=None) : 
+    skills = []
+    hits = []
+    if not skills_file : 
+        skills_file = "skills_new.csv"
+    with open(skills_file) as fopen : 
+        reader = csv.reader(fopen)
+        for row in reader : 
+            skills.extend(row)
+    clean_text = ''
+
+    # Preprocessing raw text
+    for char in text_raw : 
+        if char not in punctuation : 
+            clean_text+=char
+        else :
+            clean_text+=' '
+    word_list = clean_text.split()
+
+    for i in [1,2,3] : 
+        # @param : sequence, gram_size, list to store hits, skill list
+        hits = generate_ngram_hits(word_list,i,hits,skills)
+    hits = list(set(hits))
+    return hits
+
+
+    
 def cleanup(token, lower=True):
     if lower:
         token = token.lower()
