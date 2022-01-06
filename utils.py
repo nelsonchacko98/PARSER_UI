@@ -423,9 +423,8 @@ def generate_ngram_hits(word_list,gram_size,hits_list,skills) :
     generator = nltk.ngrams(word_list,gram_size)
     for gram in generator : 
         value_text = ' '.join(value for value in gram).lower()
-        for item in skills : 
-            if value_text in item : 
-                hits_list.append(value_text)
+        if value_text in skills : 
+            hits_list.append(value_text)
     return hits_list
 
 """ Extract skills by matching it with a saved dataset
