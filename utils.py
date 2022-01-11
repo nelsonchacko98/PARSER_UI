@@ -8,6 +8,7 @@ from datetime import datetime
 from io import StringIO
 from string import punctuation
 import nltk
+import json
 import pandas as pd
 from dateutil import relativedelta
 from nltk import text
@@ -18,6 +19,8 @@ from pdfminer.layout import LAParams
 from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
 from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFSyntaxError
+
+from dcube_resume_parser import ResumeParser
 
 import constants as cs
 
@@ -549,8 +552,16 @@ def get_data(text) :
     except StopIteration:
         return
 
-def export_to_json(file_name) :
-    pass
+def sanity_check(obj) : 
+    with open(cs.DATABASE) as fin : 
+        data = json.load(fin)
+
+def write_to_json(obj) :
+    details = obj.get_extracted_data()
+    import pdb; pdb.set_trace()
+    # TODO: PERFORM A SANITY CHECK FIRST
+    with open(cs.DATABASE,'a+') as fout : 
+        json.dump(details, fout)
 
 
 def main() :
