@@ -9,7 +9,10 @@ import json
 import csv
 import tkentrycomplete
 
-__version__ = "3.0"
+""" PHASE-1 PART THIS IS NOT THE COMPLETE PRODUCT
+    WORKING IN A BRANCH """
+
+__version__ = "3.1"
 
 """
 BETTER COMMENT
@@ -20,6 +23,9 @@ BETTER COMMENT
 TODO - somthing to be done
 --------------------
 """
+
+# TODO: Check for credentials file. If not available handle it somehow
+
 
 # Functions 
 
