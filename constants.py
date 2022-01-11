@@ -53,3 +53,5 @@ RESUME_SECTIONS_GRAD = [
                     'summary',
                     'leadership'
                 ]
+
+DATABASE = 'json_out/parsed_resumes.json'
