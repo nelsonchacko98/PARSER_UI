@@ -20,8 +20,6 @@ from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
 from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFSyntaxError
 
-from dcube_resume_parser import ResumeParser
-
 import constants as cs
 
 
