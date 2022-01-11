@@ -7,6 +7,7 @@ import re
 from datetime import datetime
 from io import StringIO
 from string import punctuation
+import json
 import nltk
 import pandas as pd
 from dateutil import relativedelta
@@ -549,8 +550,14 @@ def get_data(text) :
     except StopIteration:
         return
 
-def export_to_json(file_name) :
-    pass
+def write_to_json(details, names) :
+    res_name = details.get('resume_name')
+    if not res_name in names : 
+        with open(cs.DATABASE,'a+') as fout : 
+            json.dump(details, fout)
+            fout.write('\n')
+    else : 
+        print(f'{details.get("resume_name")} already exists in Database')
 
 
 def main() :
