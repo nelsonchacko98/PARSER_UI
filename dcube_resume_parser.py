@@ -1,10 +1,14 @@
 import spacy
-from spacy.matcher import Matcher
 import utils
-import json
 import os
-from tqdm import tqdm
 import glob
+import json
+
+import constants as cs
+
+from spacy.matcher import Matcher
+from spacy import util
+from tqdm import tqdm
 
 class ResumeParser(object):
 
@@ -26,12 +30,13 @@ class ResumeParser(object):
             'no_of_pages': None,
             'file_name' : None
         }
-        self.__resume = resume
-        ext = self.__resume.split('.')[-1]
+        self.__resume_path = resume
+        self.__resume_name = os.path.split(resume)[1]
+        ext = self.__resume_path.split('.')[-1]
         try : 
-            self.__text_raw = utils.extract_text(self.__resume, '.' + ext)
+            self.__text_raw = utils.extract_text(self.__resume_path, '.' + ext)
         except Exception as e :
-            print(f"{self.__resume} has a problem {e}")
+            print(f"{self.__resume_path} has a problem {e}")
         self.__text = ' '.join(self.__text_raw.split())
         self.__lines = utils.get_lines_from_text(self.__text_raw)
         self.__nlp = nlp(self.__text)
@@ -60,13 +65,22 @@ class ResumeParser(object):
         self.__details['email'] = email
         self.__details['skills'] = skills
         self.__details['no_of_pages'] = utils.get_number_of_pages(
-                                            self.__resume
+                                            self.__resume_path
                                         )
-        self.__details['file_name'] = self.__resume
+        self.__details['file_name'] = self.__resume_path
+        self.__details['resume_name'] = self.__resume_name
         self.__details['other name hits '] = otherHits        
         return
     
-    
+
+def get_existing_resume_names() : 
+    names = []
+    with open(cs.DATABASE) as fin : 
+        for line in fin : 
+            data = json.loads(line)
+            names.append(data.get('resume_name'))
+
+    return names
 
 def parser() : 
     print('Starting Programme')
@@ -76,6 +90,7 @@ def parser() :
     if not os.path.isdir('json_out') : 
         os.makedirs('json_out')
 
+    names = get_existing_resume_names()
     files = list(set(pdf_files))
     files.sort()
     print (f"{len(files)} files identified")
@@ -84,13 +99,8 @@ def parser() :
         print(f"Reading File {f}")
         obj = ResumeParser(f)
         details = obj.get_extracted_data()
-        
-        # fileName = f.split('\\')[-1]
-        fileName = os.path.split(f)[1].split('.')[0]
-                
-        fOut = open(f'json_out/{fileName}.json','w') 
-        fOut.write(json.dumps(details,indent=4))
-        fOut.close()
+
+        utils.write_to_json(details,names)
 
     return
         
