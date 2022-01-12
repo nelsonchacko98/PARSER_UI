@@ -9,6 +9,8 @@ import json
 import csv
 import tkentrycomplete
 
+import constants as cs
+
 """ PHASE-1 PART THIS IS NOT THE COMPLETE PRODUCT
     WORKING IN A BRANCH """
 
@@ -61,26 +63,6 @@ def delete_designation() :
     return None
 
 
-def show_matching_files() : 
-    selectedDesig = desig.get()
-    skillsNeeded = desigDict[selectedDesig]
-    filesMatched = []
-
-    files = glob.glob("json_out\*.json")
-
-    for file in files:
-        file_name = file.split("\\")[-1]
-        with open(file, 'r') as j:
-            contents = json.loads(j.read())
-
-        skillsFromResume = contents['skills']
-        commonSkills = list(set(skillsNeeded).intersection(skillsFromResume))
-
-        if len(commonSkills)>2 :
-            filesMatched.append(file)
-
-    display_list(filesMatched)
-    return None
 
 
 def clear_data():
@@ -91,6 +73,51 @@ def clear_text_widget() :
     textLabel.delete(1.0,'end')
     return None
 
+def show_matching_files() : 
+    def double_click_handler(event=None):
+        """
+        Since listBoxView is used to display all the lists, it is necessary to handle all file cases that it can contain.
+        """
+        curItem = listBoxView.get( listBoxView.curselection())
+        root,ext = os.path.splitext(curItem)
+
+        for resume in resumes : 
+            if resume.get('resume_name') == curItem : 
+                break
+
+        if ext == '.json' : 
+            textLabel.insert('1.0',str(resume))
+
+        elif ext=='.pdf' : 
+            os.startfile(resume.get('resume_path'))
+
+        else : 
+            clear_text_widget()
+            textLabel.insert('end',"Filetype can't be handled")
+        return
+
+    selectedDesig = desig.get()
+    skillsNeeded = desigDict[selectedDesig]
+    filesMatched = []
+    resumes = []
+    
+
+    with open(cs.DATABASE) as fin : 
+        for line in fin:
+            resume = json.loads(line)
+
+            skillsFromResume = resume.get('skills')
+            commonSkills = list(set(skillsNeeded).intersection(skillsFromResume))
+
+            if len(commonSkills)>2 :
+                # filesmatched list contains the names of matched resumes
+                filesMatched.append(resume.get('resume_name'))
+                resumes.append(resume)
+
+    display_list(filesMatched)
+
+    listBoxView.bind('<Double-1>', double_click_handler)
+    return None
 
 # This fucntion only displays all the *.pdf files in the confirm_resume folder and not the downloaded files.
 # TODO : Need to change this function to display the downloaded files
@@ -299,7 +326,9 @@ listBoxView.configure(xscrollcommand=listBoxScroll_x.set, yscrollcommand=listBox
 listBoxScroll_x.pack(side='bottom', fill='x')
 listBoxScroll_y.pack(side='right', fill='y')
 
-listBoxView.bind('<Double-1>', double_click_handler)
+
+# !Uncomment this if show_matching_file() didnt work
+# listBoxView.bind('<Double-1>', double_click_handler)
 
 # Set label 
 ttk.Label( bottomFrame, text = "Select the Designation :", 
@@ -329,4 +358,4 @@ root.mainloop()
 # This is to ensure all the newly added items are stored.
 
 with open('job_description.pkl','wb') as fwrite : 
-            pickle.dump(desigDict,fwrite)
+    pickle.dump(desigDict,fwrite)
