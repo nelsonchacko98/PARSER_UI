@@ -67,9 +67,9 @@ class ResumeParser(object):
         self.__details['no_of_pages'] = utils.get_number_of_pages(
                                             self.__resume_path
                                         )
-        self.__details['file_name'] = self.__resume_path
+        self.__details['resume_path'] = self.__resume_path
         self.__details['resume_name'] = self.__resume_name
-        self.__details['other name hits '] = otherHits        
+        self.__details['other name hits '] = otherHits   
         return
     
 
